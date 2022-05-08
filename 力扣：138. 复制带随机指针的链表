@@ -1,0 +1,66 @@
+/**
+ * Definition for a Node.
+ * struct Node {
+ *     int val;
+ *     struct Node *next;
+ *     struct Node *random;
+ * };
+ */
+
+struct Node* copyRandomList(struct Node* head) {
+    //1.拷贝节点插入到原节点的后面
+    struct Node* cur = head;
+    while(cur!=NULL)
+    {
+        //malloc一个节点进行拷贝
+        struct Node* copy = (struct Node*)malloc(sizeof(struct Node));
+        copy->val = cur->val;
+        //插入到原链表
+        copy->next = cur->next;
+        cur->next = copy;
+        //迭代
+        cur = copy->next;
+    }
+
+    //2.根据原链表中的节点处理copy节点的random
+    cur = head;
+    while(cur!=NULL)
+    {
+        struct Node* copy = cur->next;
+        if(cur->random == NULL)
+        {
+            copy->random = NULL;
+            cur = copy->next;
+        }
+        else
+        {
+            copy->random = cur->random->next;
+            cur = copy->next;
+        }
+    }
+    
+    //3.剪切复制的节点并尾插到新链表，将原链表复原
+    struct Node* copyHead = NULL;  //新链表表头
+    struct Node* copyTail = NULL;  //找尾指针
+    cur = head;
+    while(cur!=NULL)
+    {
+        struct Node* copy = cur->next;
+        struct Node* next = copy->next;
+        //首节点尾插
+        if(copyTail == NULL)  
+        {
+            copyHead = copyTail = copy;
+        }
+        //有节点尾插
+        else
+        {
+            copyTail->next = copy;
+            copyTail = copy;
+        }
+        cur = copy->next;
+        cur = next;
+    }
+    return copyHead;
+
+}
