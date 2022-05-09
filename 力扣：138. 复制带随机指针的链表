@@ -8,7 +8,8 @@
  */
 
 
-struct Node* copyRandomList(struct Node* head) {
+struct Node* copyRandomList(struct Node* head)
+{
     //1.拷贝节点插入到原节点的后面
     struct Node* cur = head;
     while(cur!=NULL)
