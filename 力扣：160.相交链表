@@ -1,1 +1,53 @@
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     struct ListNode *next;
+ * };
+ */
+struct ListNode *getIntersectionNode(struct ListNode *headA, struct ListNode *headB)
+ {
+    struct ListNode* tailA = headA;  //找尾指针
+    struct ListNode* tailB = headB;
+    int lenA = 1;  //记录链表长度
+    int lenB = 1;
+    //1.找到链表的尾节点并记录长度
+    while(tailA->next != NULL)
+    {
+        tailA = tailA->next;
+        lenA++;
+    }
+    while(tailB->next != NULL)
+    {
+        tailB = tailB->next;
+        lenB++;
+    }
 
+    //2.若两链表的尾节点不相等，说明两链表不相交
+    if(tailA != tailB)
+    {
+        return NULL;
+    }
+
+    //3.尾节点相等说明两链表相交
+    int gap = abs(lenA-lenB);  //求长度差
+    struct ListNode* longlist = headA;
+    struct ListNode* shortlist = headB;
+    if(lenA < lenB)
+    {
+        shortlist = headA;
+        longlist = headB;
+    }
+    
+    while(gap--)  //让长链表的指针先走gap步
+    {
+        longlist = longlist->next;
+    }
+    while(longlist != shortlist)  //两指针一起走相等就是相遇点
+    {
+        longlist = longlist->next;
+        shortlist = shortlist->next;
+    }
+    
+    return longlist;
+}
