@@ -1,0 +1,140 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<assert.h>
+#include<stdbool.h>
+
+//定义一个栈的结构体类型
+typedef char STDateType;
+typedef struct Stack
+{
+	STDateType* a;  //指针指向开辟的一段空间
+	int top;
+	int capacity;
+}ST;
+
+//函数的声明
+void StackInit(ST* ps);  //初始化函数
+
+void StackPush(ST* ps, STDateType x);  //入栈函数
+
+STDateType StackTop(ST* ps);  //读栈顶数据
+
+void StackPop(ST* ps);  //删除栈顶数据
+
+bool StackEmpty(ST* ps);  //判断栈是否为空
+
+void StackDestroy(ST* ps);  //销毁栈
+
+//函数的实现
+void StackInit(ST* ps)  //初始化函数
+{
+	assert(ps);
+
+	ps->a = NULL;
+	ps->capacity = 0;
+	ps->top = 0;
+}
+
+void StackPush(ST* ps, STDateType x)  //入栈函数
+{
+	assert(ps);
+
+	if(ps->capacity == ps->top)  //说明栈空间用完或者没有空间
+	{
+		int newcapacity = ps->capacity == 0 ? 4 : ps->capacity*2;
+		STDateType* tmp = (STDateType*)realloc(ps->a,sizeof(STDateType)*newcapacity);
+		if(tmp == NULL)
+		{
+			printf("realloc fail\n");
+			exit(-1);
+		}
+		//扩容成功
+		ps->a = tmp;
+		ps->capacity = newcapacity;
+	}
+	ps->a[ps->top] = x;
+	ps->top++;
+}
+
+STDateType StackTop(ST* ps)  //读栈顶数据
+{
+	assert(ps);
+	assert(ps->top > 0);
+
+	return ps->a[ps->top-1];
+}
+
+void StackPop(ST* ps)  //删除栈顶数据
+{
+	assert(ps);
+	assert(ps->top > 0);  //确保栈内有数据可删
+
+	ps->a[ps->top-1] = 0;
+	ps->top--;
+}
+
+bool StackEmpty(ST* ps)  //判断栈是否为空
+{
+	assert(ps);
+
+	if(ps->top == 0)
+		return true;  //栈为空返回逻辑真
+	else
+		return false;  //栈不为返回逻辑假
+}
+
+void StackDestroy(ST* ps)  //销毁栈
+{
+	assert(ps);
+
+	free(ps->a);
+	ps->a = NULL;
+	ps->capacity = 0;
+	ps->top = 0;
+}
+
+bool isValid(char * s)
+{
+    ST stack;
+    StackInit(&stack);  //初始化
+    while(*s != '\0')
+    {
+        //1.左括号入栈
+        if(*s == '(' || *s == '{' || *s == '[')  
+         {
+             StackPush(&stack,*s);
+             s++;
+         }
+
+         //2.右括号要和栈顶内容配对
+         else  
+         {
+             if(StackEmpty(&stack))  //栈为空，返回false
+             {
+                 return false;
+             }
+             
+             else  //栈不为空就取栈顶数据进行配对
+             {
+                 STDateType top = StackTop(&stack);  //top为栈顶的内容
+                 StackPop(&stack);  //删除栈顶
+                 if((top == '(' && *s != ')')
+                  ||(top == '{' && *s != '}')
+                  ||(top == '[' && *s != ']'))  //取出的内容和*s不相等
+                  {
+                      StackDestroy(&stack);
+                      return false;
+                  }
+                  else  //相等
+                  {
+                      s++;
+                  }
+             }
+         }
+    }
+
+    bool ret = StackEmpty(&stack);  //函数 栈为空返回逻辑真
+    StackDestroy(&stack);
+    return ret;
+
+}
